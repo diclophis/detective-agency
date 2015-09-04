@@ -2,7 +2,6 @@ https://github.com/postmodern/mruby-embed
 
 https://github.com/mruby/mruby/tree/1.1.0
 
-
 https://chrisjean.com/git-submodules-adding-using-removing-and-updating/
 
 http://matt.aimonetti.net/posts/2012/04/25/getting-started-with-mruby/
@@ -25,7 +24,6 @@ https://www.reddit.com/r/rust/comments/2pg8u1/is_there_a_easy_way_to_compile_cod
 
 # .deb is pushed to repo for public use
 
-
 https://github.com/yaml/libyaml
 
 https://github.com/AndrewBelt/mruby-yaml
@@ -44,8 +42,14 @@ https://github.com/SebastianEdwards/rust-mruby
 
 https://github.com/jordansissel/fpm/issues/170
 
-
-
 https://blog.jcoglan.com/2012/07/29/your-first-ruby-native-extension-c/
 
+https://github.com/carsonmcdonald/mruby-c-example
 
+https://github.com/mruby/mruby/issues/2698
+
+https://github.com/ongaeshi/mruby/blob/master/tools/mrbc/mrbc.c
+
+http://www.monami-ya.jp/lcov/monami-ya.mrb/develop/2013-05-08/src/dump.c.gcov.html
+
+https://github.com/postmodern/mruby-embed/blob/master/src/lib.c.erb
