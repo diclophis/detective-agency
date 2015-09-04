@@ -7,26 +7,17 @@
 #include <mruby/string.h>
 
 #include "build/init.h"
-#include "build/wang.h"
 
-static mrb_value biz(mrb_state* mrb, mrb_value obj)
+static mrb_value business(mrb_state* mrb, mrb_value obj)
 {
   mrb_value ret;
   mrb_value block;
   mrb_get_args(mrb, "&", &block);
 
-  fprintf(stderr, "Before block\n");
-
   ret = mrb_yield_argv(mrb, block, 0, NULL);
 
-  mrb_p(mrb, ret);
-
-  //fprintf(stderr, mrb_sprintf(mrb, "wtf: %s", ret));
-  char *path;
-  path = mrb_str_to_cstr(mrb, ret);
-  fprintf(stderr, path);
-
-  fprintf(stderr, "After block\n");
+  char *tasks = mrb_str_to_cstr(mrb, ret);
+  fprintf(stdout, tasks);
 
   return mrb_nil_value();
 }
@@ -54,19 +45,11 @@ int main(int argc, char** argv) {
 
   mrb_define_global_const(mrb, "ARGV", args);
 
-  mrb_define_method(mrb, mrb->object_class, "biz", biz, MRB_ARGS_BLOCK());
-
-  // load the compiled library
-  ret = mrb_load_irep(mrb, wang);
-  // check for exception
-  if (mrb->exc)
-  {
-    // print exception
-    mrb_p(mrb, mrb_obj_value(mrb->exc));
-  }
+  mrb_define_method(mrb, mrb->object_class, "business", business, MRB_ARGS_BLOCK());
 
   // load the compiled library
   ret = mrb_load_irep(mrb, init);
+
   // check for exception
   if (mrb->exc)
   {
@@ -74,15 +57,18 @@ int main(int argc, char** argv) {
     mrb_p(mrb, mrb_obj_value(mrb->exc));
   }
 
-  FILE *f = fopen("chung", "r");
-  ret = mrb_load_file(mrb, f);
-  fclose(f);
+  FILE *f = 0;
+  f = fopen("Detectivefile", "r");
+  if (0 != f) {
+    ret = mrb_load_file(mrb, f);
+    fclose(f);
 
-  // check for exception
-  if (mrb->exc)
-  {
-    // print exception
-    mrb_p(mrb, mrb_obj_value(mrb->exc));
+    // check for exception
+    if (mrb->exc)
+    {
+      // print exception
+      mrb_p(mrb, mrb_obj_value(mrb->exc));
+    }
   }
 
   // cleanup

@@ -1,0 +1,6 @@
+# find the ruby interperter's version
+investigate! :ruby do
+  unless its_true_that? "ruby -v | grep 'ruby 1'"
+    you_need_to :apt => "pkg=ruby state=latest"
+  end
+end
