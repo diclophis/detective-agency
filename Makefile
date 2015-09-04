@@ -19,11 +19,10 @@ ruby_headers = $(patsubst %,build/%, $(patsubst lib/%.rb,%.h, $(wildcard lib/*.r
 $(target): $(build) $(objects) yaml/src/.libs/libyaml.a mruby/build/host/lib/libmruby.a $(ruby_headers)
 	$(CXX) $(LDFLAGS) -o $@ $(objects) yaml/src/.libs/libyaml.a mruby/build/host/lib/libmruby.a
 
-mruby/bin/mrbc:
-	cd mruby && make
+mruby/bin/mrbc: mruby/build/host/lib/libmruby.a
 
 mruby/build/host/lib/libmruby.a:
-	cd mruby && make
+	cd mruby && MRUBY_CONFIG=../config/mruby.rb make
 
 yaml/src/.libs/libyaml.a:
 	cd yaml && make
@@ -38,7 +37,10 @@ $(build)/%.h: lib/%.rb mruby/bin/mrbc
 $(build):
 	mkdir -p $(build)
 
-clean:
+yaml/Makefile:
+	cd yaml && ./bootstrap && ./configure
+
+clean: yaml/Makefile
 	cd yaml && make clean
 	cd mruby && make clean
 	touch $(build) && rm -R $(build)

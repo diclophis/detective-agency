@@ -1,4 +1,4 @@
-puts 'wtf'
+#puts 'wtf'
 
 #puts Wang.foo
 #biz do |a|

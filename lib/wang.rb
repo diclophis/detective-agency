@@ -1,6 +1,6 @@
 
 class Wang
   def self.foo
-    puts "xi"
+    #puts "xi"
   end
 end

@@ -1,3 +1,6 @@
 [submodule "mruby"]
 	path = mruby
 	url = git@github.com:mruby/mruby.git
+[submodule "yaml"]
+	path = yaml
+	url = git@github.com:yaml/libyaml.git
