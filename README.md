@@ -19,13 +19,7 @@ Take for example the case of the missing ruby:
       end
     end
 
-Will generate as standard output:
-
-    $ detective-agency
-    
-
-
-You could then run this with `ansible` on your host:
+You could then run `detective-agency` feeding its output to `ansible`:
 
     $ detective-agency > install-ruby.yml
     
