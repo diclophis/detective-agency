@@ -3,7 +3,7 @@
 product=detective-agency
 build=build
 target=$(build)/$(product)
-fpm_tmp=$(shell mktemp -d -u -t fpm)
+fpm_tmp:=$(shell mktemp -d -u -t fpm)
 
 CXXFLAGS=\
 -Wall \
@@ -56,7 +56,7 @@ install: $(target)
 
 package:
 	make install DESTDIR=$(fpm_tmp)
-	fpm -s dir -t deb -n detective-agency -v 0.1.0 -C $(fpm_tmp) usr/bin
+	fpm -s dir -t deb -n detective-agency -v 0.1.0 -C $(fpm_tmp) -d ansible usr/bin
 
 clean: yaml/Makefile
 	cd yaml && make clean
