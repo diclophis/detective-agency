@@ -1,0 +1,5 @@
+detective-agency (0.1.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Mavenlink Provisioning User <diclophis+ubuntu@gmail.com>  Sat, 05 Sep 2015 13:48:19 -0700
