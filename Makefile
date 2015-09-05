@@ -3,7 +3,7 @@
 product=detective-agency
 build=build
 target=$(build)/$(product)
-fpm_tmp:=$(shell mktemp -d -u -t fpm)
+fpm_tmp:=$(shell mktemp -d -u -t fpm_XXXXX)
 
 CXXFLAGS=\
 -Wall \
