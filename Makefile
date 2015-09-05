@@ -33,7 +33,7 @@ mruby/build/host/lib/libmruby.a:
 	cd mruby && MRUBY_CONFIG=../config/mruby.rb make
 
 yaml/src/.libs/libyaml.a:
-	cd yaml && make
+	cd yaml && ./configure CFLAGS="-DYAML_DECLARE_STATIC" --enable-static --disable-shared && make
 
 $(build)/%.o: %.c $(ruby_headers)
 	$(CC) $(CXXFLAGS) -c $< -o $@
