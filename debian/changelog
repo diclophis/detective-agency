@@ -1,3 +1,15 @@
+detective-agency (0.1.0-5) precise; urgency=low
+
+  * fix build hopefully, by adding yaml deps correctly
+
+ -- Diclophis <foo@bar>  Sat, 05 Sep 2015 15:56:22 -0700
+
+detective-agency (0.1.0-4) precise; urgency=low
+
+  * fix build hopefully, by adding bison
+
+ -- Diclophis <foo@bar>  Sat, 05 Sep 2015 15:56:22 -0700
+
 detective-agency (0.1.0-3) precise; urgency=low
 
   * fix build hopefully, by adding git deps

@@ -18,4 +18,9 @@ MRuby::Build.new do |conf|
   # include the default GEMs
   # conf.gembox 'default'
   conf.bins = ["mrbc"]
+
+  conf.cc do |cc|
+    #cc.include_paths = ["#{root}/../yaml/include"]
+    cc.flags = [ENV['CFLAGS'], "-I#{root}/../yaml/include"].join(" ")
+  end
 end
