@@ -12,6 +12,8 @@ MRuby::Build.new do |conf|
 
   # Use mrbgems
   conf.gem :git => 'git@github.com:AndrewBelt/mruby-yaml.git', :branch => 'master'
+  # conf.gem :git => 'git@github.com:zzak/mruby-optparse.git', :branch => 'master'
+  # conf.gem :git => 'git@github.com:mattn/mruby-onig-regexp.git', :branch => 'master'
 
   # include the default GEMs
   # conf.gembox 'default'

@@ -1,4 +1,4 @@
-# devops detective agency
+# the devops detective-agency
 
 It was a cloudy Tuesday afternoon when she walked into my office, an ubuntu-lts server from North East data centah', with ethernet cord from her hard-drives to the floor.
 There was nothing but bad news in her logs, and I had a good idea how it got there...
@@ -6,7 +6,7 @@ She had a problem, her ruby was missing... and thats when I knew I had a job to 
 
 # how to solve the case
 
-`devops-detective-agency` will read a `Detectivefile`, look at the facts, and generate an ansible playbook that should solve your case.
+`detective-agency` will read a `Detectivefile`, look at the facts, and generate an ansible playbook that should solve your case.
 
 Take for example the case of the missing ruby:
 
@@ -21,13 +21,13 @@ Take for example the case of the missing ruby:
 
 Will generate as standard output:
 
-    $ devops-detective-agency
+    $ detective-agency
     
 
 
 You could then run this with `ansible` on your host:
 
-    $ devops-detective-agency > install-ruby.yml
+    $ detective-agency > install-ruby.yml
     
     $ cat install-ruby.yml
     

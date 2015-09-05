@@ -1,7 +1,7 @@
 # OSX Makefile
 
 build=build
-target=$(build)/devops-detective-agency
+target=$(build)/detective-agency
 
 CXXFLAGS=\
 -Wall \

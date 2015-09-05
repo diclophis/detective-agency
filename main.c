@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <mruby.h>
 #include <mruby/array.h>
@@ -47,14 +48,22 @@ int main(int argc, char** argv) {
 
   mrb_define_method(mrb, mrb->object_class, "business", business, MRB_ARGS_BLOCK());
 
-  // load the compiled library
-  ret = mrb_load_irep(mrb, init);
+  int bundled_ruby_count = 1;
+  uint8_t const **bundled_ruby = (uint8_t const **)malloc(sizeof(const uint8_t *) * bundled_ruby_count);
 
-  // check for exception
-  if (mrb->exc)
-  {
-    // print exception
-    mrb_p(mrb, mrb_obj_value(mrb->exc));
+  bundled_ruby[0] = init;
+
+  for (int i=0; i<bundled_ruby_count; i++) {
+    // load the compiled library
+    ret = mrb_load_irep(mrb, bundled_ruby[i]);
+
+    // check for exception
+    if (mrb->exc)
+    {
+      // print exception
+      mrb_p(mrb, mrb_obj_value(mrb->exc));
+      return 1;
+    }
   }
 
   FILE *f = 0;
