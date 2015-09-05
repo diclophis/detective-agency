@@ -17,6 +17,7 @@ MRuby::Build.new do |conf|
 
   # include the default GEMs
   # conf.gembox 'default'
+  conf.bins = ["mrbc"]
 end
 
 MRuby::Build.new('host-debug') do |conf|
