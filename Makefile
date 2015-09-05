@@ -17,7 +17,7 @@ objects = $(patsubst %,build/%, $(patsubst %.c,%.o, $(wildcard *.c)))
 ruby_headers = $(patsubst %,build/%, $(patsubst lib/%.rb,%.h, $(wildcard lib/*.rb)))
 
 $(target): $(build) $(objects) yaml/src/.libs/libyaml.a mruby/build/host/lib/libmruby.a $(ruby_headers)
-	$(CXX) $(LDFLAGS) -o $@ $(objects) yaml/src/.libs/libyaml.a mruby/build/host/lib/libmruby.a
+	$(CC) $(LDFLAGS) -o $@ $(objects) mruby/build/host/lib/libmruby.a yaml/src/.libs/libyaml.a -lm
 
 test: $(build)/ansible.log
 

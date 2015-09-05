@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 
   bundled_ruby[0] = init;
 
-  for (int i=0; i<bundled_ruby_count; i++) {
+  for (i=0; i<bundled_ruby_count; i++) {
     // load the compiled library
     ret = mrb_load_irep(mrb, bundled_ruby[i]);
 
