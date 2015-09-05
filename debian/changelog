@@ -1,5 +1,17 @@
-detective-agency (0.1.0-1) unstable; urgency=low
+detective-agency (0.1.0-3) precise; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * fix build hopefully, by adding git deps
 
- -- Mavenlink Provisioning User <diclophis+ubuntu@gmail.com>  Sat, 05 Sep 2015 13:48:19 -0700
+ -- Diclophis <foo@bar>  Sat, 05 Sep 2015 15:56:22 -0700
+
+detective-agency (0.1.0-2) precise; urgency=low
+
+  * fix build hopefully, by adding ruby deps
+
+ -- Diclophis <foo@bar>  Sat, 05 Sep 2015 15:56:22 -0700
+
+detective-agency (0.1.0-1) precise; urgency=low
+
+  * Initial release
+
+ -- Diclophis <foo@bar>  Sat, 05 Sep 2015 13:48:19 -0700
