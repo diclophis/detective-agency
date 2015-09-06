@@ -18,26 +18,9 @@ MRuby::Build.new do |conf|
   # include the default GEMs
   # conf.gembox 'default'
   conf.bins = ["mrbc"]
-end
 
-MRuby::Build.new('host-debug') do |conf|
-  # load specific toolchain settings
-
-  # Gets set by the VS command prompts.
-  if ENV['VisualStudioVersion'] || ENV['VSINSTALLDIR']
-    toolchain :visualcpp
-  else
-    toolchain :gcc
+  conf.cc do |cc|
+    #cc.include_paths = ["#{root}/../yaml/include"]
+    cc.flags = [ENV['CFLAGS'], "-I#{root}/../yaml/include"].join(" ")
   end
-
-  enable_debug
-
-  # include the default GEMs
-  conf.gembox 'default'
-
-  # C compiler settings
-  conf.cc.defines = %w(ENABLE_DEBUG)
-
-  # Generate mruby debugger command (require mruby-eval)
-  conf.gem :core => "mruby-bin-debugger"
 end

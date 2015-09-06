@@ -1,0 +1,12 @@
+Source: detective-agency
+Section: admin
+Priority: extra
+Maintainer: Diclophis <diclophis+ubuntu@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), ruby, git, bison
+Standards-Version: 3.9.2
+Homepage: https://github.com/diclophis/detective-agency
+
+Package: detective-agency
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: ansible playbook generator

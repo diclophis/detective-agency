@@ -1,0 +1,383 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ detective-agency (0.1.0-5) precise; urgency=low
+ .
+   * fix build hopefully, by adding yaml deps correctly
+Author: Diclophis <foo@bar>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- detective-agency-0.1.0.orig/config/mruby.rb
++++ detective-agency-0.1.0/config/mruby.rb
+@@ -18,4 +18,9 @@ MRuby::Build.new do |conf|
+   # include the default GEMs
+   # conf.gembox 'default'
+   conf.bins = ["mrbc"]
++
++  conf.cc do |cc|
++    #cc.include_paths = ["#{root}/../yaml/include"]
++    cc.flags = [ENV['CFLAGS'], "-I#{root}/../yaml/include"].join(" ")
++  end
+ end
+--- detective-agency-0.1.0.orig/yaml/Makefile
++++ detective-agency-0.1.0/yaml/Makefile
+@@ -147,7 +147,7 @@ CC = gcc
+ CCDEPMODE = depmode=gcc3
+ CFLAGS = -DYAML_DECLARE_STATIC
+ CPP = gcc -E
+-CPPFLAGS = -D_FORTIFY_SOURCE=2
++CPPFLAGS = 
+ CYGPATH_W = echo
+ DEFS = -DHAVE_CONFIG_H
+ DEPDIR = .deps
+--- detective-agency-0.1.0.orig/yaml/config.log
++++ detective-agency-0.1.0/yaml/config.log
+@@ -27,11 +27,17 @@ uname -v = #104~precise1-Ubuntu SMP Tue
+ /usr/bin/oslevel       = unknown
+ /bin/universe          = unknown
+ 
++PATH: /home/provision/.rvm/gems/ruby-2.2.2@global/bin
++PATH: /home/provision/.rvm/rubies/ruby-2.2.2/bin
++PATH: /usr/local/sbin
++PATH: /usr/local/bin
+ PATH: /usr/sbin
+ PATH: /usr/bin
+ PATH: /sbin
+ PATH: /bin
+-PATH: /usr/bin/X11
++PATH: /usr/games
++PATH: /home/provision/.rvm/bin
++PATH: /home/provision/.rvm/bin
+ 
+ 
+ ## ----------- ##
+@@ -80,35 +86,35 @@ gcc: fatal error: no input files
+ compilation terminated.
+ configure:3098: $? = 4
+ configure:3118: checking whether the C compiler works
+-configure:3140: gcc -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2  conftest.c  >&5
++configure:3140: gcc -DYAML_DECLARE_STATIC   conftest.c  >&5
+ configure:3144: $? = 0
+ configure:3192: result: yes
+ configure:3195: checking for C compiler default output file name
+ configure:3197: result: a.out
+ configure:3203: checking for suffix of executables
+-configure:3210: gcc -o conftest -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2  conftest.c  >&5
++configure:3210: gcc -o conftest -DYAML_DECLARE_STATIC   conftest.c  >&5
+ configure:3214: $? = 0
+ configure:3236: result: 
+ configure:3258: checking whether we are cross compiling
+-configure:3266: gcc -o conftest -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2  conftest.c  >&5
++configure:3266: gcc -o conftest -DYAML_DECLARE_STATIC   conftest.c  >&5
+ configure:3270: $? = 0
+ configure:3277: ./conftest
+ configure:3281: $? = 0
+ configure:3296: result: no
+ configure:3301: checking for suffix of object files
+-configure:3323: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:3323: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:3327: $? = 0
+ configure:3348: result: o
+ configure:3352: checking whether we are using the GNU C compiler
+-configure:3371: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:3371: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:3371: $? = 0
+ configure:3380: result: yes
+ configure:3389: checking whether gcc accepts -g
+-configure:3409: gcc -c -g -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:3409: gcc -c -g  conftest.c >&5
+ configure:3409: $? = 0
+ configure:3450: result: yes
+ configure:3467: checking for gcc option to accept ISO C89
+-configure:3531: gcc  -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:3531: gcc  -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:3531: $? = 0
+ configure:3544: result: none needed
+ configure:3575: checking for style of include used by make
+@@ -116,9 +122,9 @@ configure:3603: result: GNU
+ configure:3629: checking dependency style of gcc
+ configure:3740: result: gcc3
+ configure:3760: checking how to run the C preprocessor
+-configure:3791: gcc -E -D_FORTIFY_SOURCE=2 conftest.c
++configure:3791: gcc -E  conftest.c
+ configure:3791: $? = 0
+-configure:3805: gcc -E -D_FORTIFY_SOURCE=2 conftest.c
++configure:3805: gcc -E  conftest.c
+ conftest.c:15:28: fatal error: ac_nonexistent.h: No such file or directory
+ compilation terminated.
+ configure:3805: $? = 1
+@@ -139,9 +145,9 @@ configure: failed program was:
+ | /* end confdefs.h.  */
+ | #include <ac_nonexistent.h>
+ configure:3830: result: gcc -E
+-configure:3850: gcc -E -D_FORTIFY_SOURCE=2 conftest.c
++configure:3850: gcc -E  conftest.c
+ configure:3850: $? = 0
+-configure:3864: gcc -E -D_FORTIFY_SOURCE=2 conftest.c
++configure:3864: gcc -E  conftest.c
+ conftest.c:15:28: fatal error: ac_nonexistent.h: No such file or directory
+ compilation terminated.
+ configure:3864: $? = 1
+@@ -186,7 +192,7 @@ configure:4498: result: yes
+ configure:4510: checking for BSD- or MS-compatible name lister (nm)
+ configure:4559: result: /usr/bin/nm -B
+ configure:4689: checking the name lister (/usr/bin/nm -B) interface
+-configure:4696: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:4696: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:4699: /usr/bin/nm -B "conftest.o"
+ configure:4702: output
+ 0000000000000000 B some_variable
+@@ -216,7 +222,7 @@ configure:5564: checking for ar
+ configure:5580: found /usr/bin/ar
+ configure:5591: result: ar
+ configure:5628: checking for archiver @FILE support
+-configure:5645: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:5645: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:5645: $? = 0
+ configure:5648: ar cru libconftest.a @conftest.lst >&5
+ configure:5651: $? = 0
+@@ -231,16 +237,16 @@ configure:5828: checking for ranlib
+ configure:5844: found /usr/bin/ranlib
+ configure:5855: result: ranlib
+ configure:5957: checking command to parse /usr/bin/nm -B output from gcc object
+-configure:6077: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:6077: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:6080: $? = 0
+ configure:6084: /usr/bin/nm -B conftest.o \| sed -n -e 's/^.*[ ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[ ][ ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | sed '/ __gnu_lto/d' \> conftest.nm
+ configure:6087: $? = 0
+-configure:6153: gcc -o conftest -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2  conftest.c conftstm.o >&5
++configure:6153: gcc -o conftest -DYAML_DECLARE_STATIC   conftest.c conftstm.o >&5
+ configure:6156: $? = 0
+ configure:6194: result: ok
+ configure:6231: checking for sysroot
+ configure:6261: result: no
+-configure:6338: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:6338: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:6341: $? = 0
+ configure:6517: checking for mt
+ configure:6533: found /bin/mt
+@@ -249,70 +255,70 @@ configure:6567: checking if mt is a mani
+ configure:6573: mt '-?'
+ configure:6581: result: no
+ configure:7219: checking for ANSI C header files
+-configure:7239: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7239: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7239: $? = 0
+-configure:7312: gcc -o conftest -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2  conftest.c  >&5
++configure:7312: gcc -o conftest -DYAML_DECLARE_STATIC   conftest.c  >&5
+ configure:7312: $? = 0
+ configure:7312: ./conftest
+ configure:7312: $? = 0
+ configure:7323: result: yes
+ configure:7336: checking for sys/types.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for sys/stat.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for stdlib.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for string.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for memory.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for strings.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for inttypes.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for stdint.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7336: checking for unistd.h
+-configure:7336: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7336: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7336: $? = 0
+ configure:7336: result: yes
+ configure:7350: checking for dlfcn.h
+-configure:7350: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:7350: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:7350: $? = 0
+ configure:7350: result: yes
+ configure:7556: checking for objdir
+ configure:7571: result: .libs
+ configure:7838: checking if gcc supports -fno-rtti -fno-exceptions
+-configure:7856: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 -fno-rtti -fno-exceptions conftest.c >&5
++configure:7856: gcc -c -DYAML_DECLARE_STATIC  -fno-rtti -fno-exceptions conftest.c >&5
+ cc1: warning: command line option '-fno-rtti' is valid for C++/ObjC++ but not for C [enabled by default]
+ configure:7860: $? = 0
+ configure:7873: result: no
+ configure:8200: checking for gcc option to produce PIC
+ configure:8207: result: -fPIC -DPIC
+ configure:8215: checking if gcc PIC flag -fPIC -DPIC works
+-configure:8233: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 -fPIC -DPIC -DPIC conftest.c >&5
++configure:8233: gcc -c -DYAML_DECLARE_STATIC  -fPIC -DPIC -DPIC conftest.c >&5
+ configure:8237: $? = 0
+ configure:8250: result: yes
+ configure:8279: checking if gcc static flag -static works
+ configure:8307: result: yes
+ configure:8322: checking if gcc supports -c -o file.o
+-configure:8343: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 -o out/conftest2.o conftest.c >&5
++configure:8343: gcc -c -DYAML_DECLARE_STATIC  -o out/conftest2.o conftest.c >&5
+ configure:8347: $? = 0
+ configure:8369: result: yes
+ configure:8377: checking if gcc supports -c -o file.o
+@@ -320,7 +326,7 @@ configure:8424: result: yes
+ configure:8457: checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries
+ configure:9614: result: yes
+ configure:9854: checking dynamic linker characteristics
+-configure:10365: gcc -o conftest -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2  -Wl,-rpath -Wl,/foo conftest.c  >&5
++configure:10365: gcc -o conftest -DYAML_DECLARE_STATIC   -Wl,-rpath -Wl,/foo conftest.c  >&5
+ configure:10365: $? = 0
+ configure:10599: result: GNU/Linux ld.so
+ configure:10706: checking how to hardcode library paths into programs
+@@ -340,13 +346,13 @@ configure:11534: result: yes
+ configure:11544: checking for stdlib.h
+ configure:11544: result: yes
+ configure:11556: checking for an ANSI C-conforming const
+-configure:11621: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:11621: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:11621: $? = 0
+ configure:11628: result: yes
+ configure:11636: checking for size_t
+-configure:11636: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:11636: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ configure:11636: $? = 0
+-configure:11636: gcc -c -DYAML_DECLARE_STATIC -D_FORTIFY_SOURCE=2 conftest.c >&5
++configure:11636: gcc -c -DYAML_DECLARE_STATIC  conftest.c >&5
+ conftest.c: In function 'main':
+ conftest.c:65:21: error: expected expression before ')' token
+ configure:11636: $? = 1
+@@ -460,11 +466,11 @@ ac_cv_env_CC_set=
+ ac_cv_env_CC_value=
+ ac_cv_env_CFLAGS_set=set
+ ac_cv_env_CFLAGS_value=-DYAML_DECLARE_STATIC
+-ac_cv_env_CPPFLAGS_set=set
+-ac_cv_env_CPPFLAGS_value=-D_FORTIFY_SOURCE=2
++ac_cv_env_CPPFLAGS_set=
++ac_cv_env_CPPFLAGS_value=
+ ac_cv_env_CPP_set=
+ ac_cv_env_CPP_value=
+-ac_cv_env_LDFLAGS_set=set
++ac_cv_env_LDFLAGS_set=
+ ac_cv_env_LDFLAGS_value=
+ ac_cv_env_LIBS_set=
+ ac_cv_env_LIBS_value=
+@@ -551,7 +557,7 @@ CC='gcc'
+ CCDEPMODE='depmode=gcc3'
+ CFLAGS='-DYAML_DECLARE_STATIC'
+ CPP='gcc -E'
+-CPPFLAGS='-D_FORTIFY_SOURCE=2'
++CPPFLAGS=''
+ CYGPATH_W='echo'
+ DEFS='-DHAVE_CONFIG_H'
+ DEPDIR='.deps'
+--- detective-agency-0.1.0.orig/yaml/config.status
++++ detective-agency-0.1.0/yaml/config.status
+@@ -439,7 +439,7 @@ $config_commands
+ 
+ Report bugs to <http://pyyaml.org/newticket?component=libyaml>."
+ 
+-ac_cs_config="'CFLAGS=-DYAML_DECLARE_STATIC' '--enable-static' '--disable-shared' 'LDFLAGS=' 'CPPFLAGS=-D_FORTIFY_SOURCE=2'"
++ac_cs_config="'CFLAGS=-DYAML_DECLARE_STATIC' '--enable-static' '--disable-shared'"
+ ac_cs_version="\
+ yaml config.status 0.1.6
+ configured by ./configure, generated by GNU Autoconf 2.68,
+@@ -531,7 +531,7 @@ if $ac_cs_silent; then
+ fi
+ 
+ if $ac_cs_recheck; then
+-  set X '/bin/bash' './configure'  'CFLAGS=-DYAML_DECLARE_STATIC' '--enable-static' '--disable-shared' 'LDFLAGS=' 'CPPFLAGS=-D_FORTIFY_SOURCE=2' $ac_configure_extra_args --no-create --no-recursion
++  set X '/bin/bash' './configure'  'CFLAGS=-DYAML_DECLARE_STATIC' '--enable-static' '--disable-shared' $ac_configure_extra_args --no-create --no-recursion
+   shift
+   $as_echo "running CONFIG_SHELL=/bin/bash $*" >&6
+   CONFIG_SHELL='/bin/bash'
+@@ -880,7 +880,7 @@ S["DEPDIR"]=".deps"
+ S["OBJEXT"]="o"
+ S["EXEEXT"]=""
+ S["ac_ct_CC"]="gcc"
+-S["CPPFLAGS"]="-D_FORTIFY_SOURCE=2"
++S["CPPFLAGS"]=""
+ S["LDFLAGS"]=""
+ S["CFLAGS"]="-DYAML_DECLARE_STATIC"
+ S["CC"]="gcc"
+--- detective-agency-0.1.0.orig/yaml/win32/Makefile
++++ detective-agency-0.1.0/yaml/win32/Makefile
+@@ -57,7 +57,7 @@ CC = gcc
+ CCDEPMODE = depmode=gcc3
+ CFLAGS = -DYAML_DECLARE_STATIC
+ CPP = gcc -E
+-CPPFLAGS = -D_FORTIFY_SOURCE=2
++CPPFLAGS = 
+ CYGPATH_W = echo
+ DEFS = -DHAVE_CONFIG_H
+ DEPDIR = .deps
+--- detective-agency-0.1.0.orig/yaml/include/Makefile
++++ detective-agency-0.1.0/yaml/include/Makefile
+@@ -90,7 +90,7 @@ CC = gcc
+ CCDEPMODE = depmode=gcc3
+ CFLAGS = -DYAML_DECLARE_STATIC
+ CPP = gcc -E
+-CPPFLAGS = -D_FORTIFY_SOURCE=2
++CPPFLAGS = 
+ CYGPATH_W = echo
+ DEFS = -DHAVE_CONFIG_H
+ DEPDIR = .deps
+--- detective-agency-0.1.0.orig/yaml/tests/Makefile
++++ detective-agency-0.1.0/yaml/tests/Makefile
+@@ -135,7 +135,7 @@ CC = gcc
+ CCDEPMODE = depmode=gcc3
+ CFLAGS = -DYAML_DECLARE_STATIC
+ CPP = gcc -E
+-CPPFLAGS = -D_FORTIFY_SOURCE=2
++CPPFLAGS = 
+ CYGPATH_W = echo
+ DEFS = -DHAVE_CONFIG_H
+ DEPDIR = .deps
+--- detective-agency-0.1.0.orig/yaml/src/Makefile
++++ detective-agency-0.1.0/yaml/src/Makefile
+@@ -109,7 +109,7 @@ CC = gcc
+ CCDEPMODE = depmode=gcc3
+ CFLAGS = -DYAML_DECLARE_STATIC
+ CPP = gcc -E
+-CPPFLAGS = -D_FORTIFY_SOURCE=2
++CPPFLAGS = 
+ CYGPATH_W = echo
+ DEFS = -DHAVE_CONFIG_H
+ DEPDIR = .deps
