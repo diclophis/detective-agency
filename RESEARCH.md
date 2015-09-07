@@ -18,12 +18,6 @@ http://geekmonkey.org/2012/10/an-introduction-to-mini-ruby/
 
 https://www.reddit.com/r/rust/comments/2pg8u1/is_there_a_easy_way_to_compile_code_on_os_x_and/
 
-# development builds OSX binary, used to test contents of the pi package
-
-# on linux, FPM can be used to build .deb, or to just build from git checkout
-
-# .deb is pushed to repo for public use
-
 https://github.com/yaml/libyaml
 
 https://github.com/AndrewBelt/mruby-yaml
@@ -101,3 +95,5 @@ https://launchpad.net/builders/
 https://help.launchpad.net/ReadingOpenPgpMail
 
 http://rnelson0.com/2014/10/13/fpm-and-build-automation/
+
+https://github.com/mruby/mruby/blob/master/src/backtrace.c
