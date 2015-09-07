@@ -6,8 +6,21 @@
 #include <mruby/irep.h>
 #include <mruby/compile.h>
 #include <mruby/string.h>
+#include <mruby/error.h>
 
 #include "build/init.h"
+
+static void if_exception_error_and_exit(mrb_state* mrb, char *msg) {
+  // check for exception
+  if (mrb->exc)
+  {
+    // print msg and exception
+    fprintf(stderr, "%s", msg);
+    mrb_print_error(mrb);
+    exit(3);
+  }
+}
+
 
 static mrb_value business(mrb_state* mrb, mrb_value obj)
 {
@@ -17,8 +30,10 @@ static mrb_value business(mrb_state* mrb, mrb_value obj)
 
   ret = mrb_yield_argv(mrb, block, 0, NULL);
 
+  if_exception_error_and_exit(mrb, "Exception in business yield\n");
+
   char *tasks = mrb_str_to_cstr(mrb, ret);
-  fprintf(stdout, tasks);
+  fprintf(stdout, "%s", tasks);
 
   return mrb_nil_value();
 }
@@ -50,37 +65,31 @@ int main(int argc, char** argv) {
 
   int bundled_ruby_count = 1;
   uint8_t const **bundled_ruby = (uint8_t const **)malloc(sizeof(const uint8_t *) * bundled_ruby_count);
-
   bundled_ruby[0] = init;
-
   for (i=0; i<bundled_ruby_count; i++) {
     // load the compiled library
     ret = mrb_load_irep(mrb, bundled_ruby[i]);
-
-    // check for exception
-    if (mrb->exc)
-    {
-      // print exception
-      mrb_p(mrb, mrb_obj_value(mrb->exc));
-      return 1;
-    }
+    if_exception_error_and_exit(mrb, "Exception in bundled ruby\n");
   }
 
   FILE *f = 0;
   f = fopen("Detectivefile", "r");
-  if (0 != f) {
-    ret = mrb_load_file(mrb, f);
-    fclose(f);
-
-    // check for exception
-    if (mrb->exc)
-    {
-      // print exception
-      mrb_p(mrb, mrb_obj_value(mrb->exc));
-    }
+  if (0 == f) {
+    return 2;
   }
+
+  //no-debug mode
+  //ret = mrb_load_file(mrb, f);
+
+  mrbc_context *cc = mrbc_context_new(mrb);
+  mrbc_filename(mrb, cc, "Detectivefile");
+  ret = mrb_load_file_cxt(mrb, f, cc);
+  mrbc_context_free(mrb, cc);
+  fclose(f);
+  if_exception_error_and_exit(mrb, "Exception in Detectivefile\n");
 
   // cleanup
   mrb_close(mrb);
+
   return 0;
 }

@@ -8,7 +8,7 @@ MRuby::Build.new do |conf|
     toolchain :gcc
   end
 
-  #enable_debug
+  enable_debug
 
   # Use mrbgems
   conf.gem :git => 'git@github.com:AndrewBelt/mruby-yaml.git', :branch => 'master'

@@ -42,7 +42,7 @@ $(build)/%.o: %.c $(ruby_headers)
 
 #mruby/bin/mrbc -B init -o build/init.h lib/init.rb
 $(build)/%.h: lib/%.rb mruby/bin/mrbc
-	mruby/bin/mrbc -B $(patsubst build/%.h,%, $@) -o $@ $<
+	mruby/bin/mrbc -g -B $(patsubst build/%.h,%, $@) -o $@ $<
 
 $(build):
 	mkdir -p $(build)
