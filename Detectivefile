@@ -1,11 +1,11 @@
 # find the ruby interperter's version
 
 investigate! :ruby_tuesday do
-  unless_its_true_that? "ruby -v | grep 'ruby 1'" do
-    you_need :apt => "pkg=ruby1.8 state=latest"
+  if_its_true_that? "ruby -v | grep 'ruby 1.8'" do
+    you_need :apt => "pkg=ruby1.8 state=absent"
   end
 
-  if_its_true_that? "ruby -v | grep 'ruby 1'" do
-    you_need :apt => "pkg=ruby1.8 state=absent"
+  unless_its_true_that? "ruby -v | grep 'ruby 1.9'" do
+    you_need :apt => "pkg=ruby1.9.3 state=latest"
   end
 end

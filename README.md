@@ -14,8 +14,12 @@ Take for example the case of the missing ruby:
     
     # find the ruby interperter's version
     investigate! :ruby do
-      unless its_true_that? "ruby -v | grep 'ruby 1'"
-        you_need_to :apt => "pkg=ruby state=latest"
+      if_its_true_that? "ruby -v | grep 'ruby 1.8'" do
+        you_need :apt => "pkg=ruby1.8 state=absent"
+      end
+
+      unless_its_true_that? "ruby -v | grep 'ruby 1.9'" do
+        you_need :apt => "pkg=ruby1.9 state=latest"
       end
     end
 
