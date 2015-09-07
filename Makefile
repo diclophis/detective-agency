@@ -21,12 +21,10 @@ ruby_headers = $(patsubst %,build/%, $(patsubst lib/%.rb,%.h, $(wildcard lib/*.r
 $(target): $(build) $(objects) yaml/src/.libs/libyaml.a mruby/build/host/lib/libmruby.a $(ruby_headers)
 	$(CC) $(LDFLAGS) -o $@ $(objects) mruby/build/host/lib/libmruby.a yaml/src/.libs/libyaml.a -lm
 
-test: $(build)/ansible.log
+test: $(build)/test.yml
+	ansible-playbook -vvv -i inventory $(build)/test.yml
 
-build/ansible.log: $(build)/test.yml
-	ansible-playbook -i inventory $(build)/test.yml | tee $@
-
-$(build)/test.yml: $(target)
+$(build)/test.yml: $(target) Detectivefile
 	$(target) > $@
 
 mruby/bin/mrbc: mruby/build/host/lib/libmruby.a
@@ -40,7 +38,6 @@ yaml/src/.libs/libyaml.a:
 $(build)/%.o: %.c $(ruby_headers)
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
-#mruby/bin/mrbc -B init -o build/init.h lib/init.rb
 $(build)/%.h: lib/%.rb mruby/bin/mrbc
 	mruby/bin/mrbc -g -B $(patsubst build/%.h,%, $@) -o $@ $<
 
