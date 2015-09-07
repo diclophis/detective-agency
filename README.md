@@ -51,3 +51,10 @@ You could then run `detective-agency` feeding its output to `ansible`:
     
     PLAY RECAP ******************************************************************** 
     localhost       : ok=2    changed=1    unreachable=0    failed=0
+
+# install from PPA
+
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 14F4C975
+    echo "deb http://ppa.launchpad.net/diclophis/detective-agency/ubuntu precise main" | sudo tee /etc/apt/sources.list.d/diclophis.list
+    sudo apt-get update
+    sudo apt-get install detective-agency
