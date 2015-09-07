@@ -58,6 +58,15 @@ package:
 	make install DESTDIR=$(fpm_tmp)
 	fpm -s dir -t deb -n detective-agency -v 0.1.0 -C $(fpm_tmp) -d ansible usr/bin
 
+ppa:
+#make clean
+# remove .git dirs
+#dh_make --createorig -c gpl -e diclophis+ubuntu@gmail.com -s -a -p detective-agency_0.2.0
+#debuild -S -sa
+#cd ..
+#dput -f -u ppa:diclophis/detective-agency detective-agency_0.2.0-1_source.changes 
+	echo read Makefile for manual instructions
+
 clean: yaml/Makefile
 	cd yaml && make clean
 	cd mruby && make clean
