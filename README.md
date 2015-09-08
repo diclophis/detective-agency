@@ -25,13 +25,7 @@ end
 
 You could then run `detective-agency` feeding its output to `ansible`:
 
-    $ detective-agency > install-ruby.yml
-    
-    $ cat install-ruby.yml
-    
-
-
-```yaml
+    $ detective-agency | tee install-ruby.yml
     ---
     - hosts: all
       tasks:
@@ -39,12 +33,11 @@ You could then run `detective-agency` feeding its output to `ansible`:
         register: last_command
         ignore_errors: true
       - apt: pkg=ruby state=latest
-        sudo: true
+        sudo: tru
         when: last_command.rc != 0
     ...
-```
     
-    $ ansible-playbook -i inventory ruby.yml 
+    $ ansible-playbook -i inventory install-ruby.yml 
 
     PLAY [all] ******************************************************************** 
     
