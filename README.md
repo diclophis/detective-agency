@@ -7,21 +7,21 @@ She had a problem, her ruby was missing... and thats when I knew I had a job to 
 # how to solve the case
 
 `detective-agency` will read a `Detectivefile`, look at the facts, and generate an ansible playbook that should solve your case.
-
+    
 Take for example the case of the missing ruby:
 
-    ```ruby
-    # find the ruby interperter's version
-    investigate! :ruby do
-      if_its_true_that? "ruby -v | grep 'ruby 1.8'" do
-        you_need :apt => "pkg=ruby1.8 state=absent"
-      end
+```ruby
+# find the ruby interperter's version
+investigate! :ruby do
+  if_its_true_that? "ruby -v | grep 'ruby 1.8'" do
+    you_need :apt => "pkg=ruby1.8 state=absent"
+  end
 
-      unless_its_true_that? "ruby -v | grep 'ruby 1.9'" do
-        you_need :apt => "pkg=ruby1.9 state=latest"
-      end
-    end
-    ```
+  unless_its_true_that? "ruby -v | grep 'ruby 1.9'" do
+    you_need :apt => "pkg=ruby1.9 state=latest"
+  end
+end
+```
 
 You could then run `detective-agency` feeding its output to `ansible`:
 
@@ -29,6 +29,9 @@ You could then run `detective-agency` feeding its output to `ansible`:
     
     $ cat install-ruby.yml
     
+
+
+```yaml
     ---
     - hosts: all
       tasks:
@@ -39,6 +42,7 @@ You could then run `detective-agency` feeding its output to `ansible`:
         sudo: true
         when: last_command.rc != 0
     ...
+```
     
     $ ansible-playbook -i inventory ruby.yml 
 
