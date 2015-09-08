@@ -10,8 +10,7 @@ She had a problem, her ruby was missing... and thats when I knew I had a job to 
 
 Take for example the case of the missing ruby:
 
-    $ cat Detectivefile
-    
+    ```ruby
     # find the ruby interperter's version
     investigate! :ruby do
       if_its_true_that? "ruby -v | grep 'ruby 1.8'" do
