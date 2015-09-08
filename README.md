@@ -21,6 +21,7 @@ Take for example the case of the missing ruby:
         you_need :apt => "pkg=ruby1.9 state=latest"
       end
     end
+    ```
 
 You could then run `detective-agency` feeding its output to `ansible`:
 
