@@ -12,6 +12,12 @@ CFLAGS=-Imruby/include
 $(target): $(build) $(objects) $(mruby_static_lib)
 	$(CC) $(LDFLAGS) -o $@ $(objects) $(mruby_static_lib)
 
+test: $(build)/test.yml
+	ansible-playbook --list-tasks -v -i 'localhost,' -c local $(build)/test.yml
+
+$(build)/test.yml: $(target) Detectivefile
+	$(target) > $@
+
 clean:
 	cd mruby && make clean
 	touch $(build) && rm -R $(build)
