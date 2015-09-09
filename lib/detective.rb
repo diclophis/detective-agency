@@ -2,7 +2,7 @@
 def investigate!(*args)
   yield
   business do
-    tasks
+    tasks(args)
   end
 end
 

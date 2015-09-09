@@ -1,7 +1,8 @@
 # basic implementation of DSL
 
+=begin
 def tasks
-  "---\n- name: stuff"
+  YAML.dump([{:name => "stuff"}])
 end
 
 def push_command(args)
@@ -11,23 +12,23 @@ end
 def register_last_command(args, if_or_unless)
   return true
 end
+=end
 
 def usual_suspects!(args)
   push_command(args)
 end
 
-=begin
+def tasks(args)
+  playbook = {:hosts => "all"}.merge(*args)
+  playbook[:tasks] = @tasks
+  YAML.dump([playbook])
+end
+
 def push_command(args)
   @tasks << args.merge({
     :sudo => true,
     :when => @toggle
   })
-end
-
-def tasks
-  playbook = {:hosts => "all"}.merge(*args)
-  playbook[:tasks] = @tasks
-  #YAML.dump([playbook])
 end
 
 def register_last_command(args, if_or_unless)
@@ -40,4 +41,3 @@ def register_last_command(args, if_or_unless)
   end
   @tasks << { :shell => args.join(" "), :register => "last_command", :ignore_errors => true }
 end
-=end

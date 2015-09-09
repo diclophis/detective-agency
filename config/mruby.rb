@@ -5,4 +5,9 @@ MRuby::Build.new do |conf|
   enable_debug
 
   conf.bins = ["mrbc"]
+
+  conf.gem :git => 'git@github.com:AndrewBelt/mruby-yaml.git', :branch => 'master'
+  conf.cc do |cc|
+    cc.flags = [ENV['CFLAGS'], "-I#{root}/../yaml/include"].join(" ")
+  end
 end
