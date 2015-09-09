@@ -10,19 +10,21 @@ def register_last_command(args, if_or_unless)
   { :shell => args.join(" "), :register => "last_command", :ignore_errors => true }
 end
 
-def you_need(args)
+def usual_suspects!(args)
   $solution << args.merge({
+    #:foo => caller.inspect,
+    #:name => "This shit came from:#{__LINE__}/#{__FILE__}",
     :sudo => true,
     :when => $toggle
   })
 end
 
-def unless_its_true_that?(*args)
+def stake_out?(*args)
   $solution << register_last_command(args, false)
   yield
 end
 
-def if_its_true_that?(*args)
+def stake_out!(*args)
   $solution << register_last_command(args, true)
   yield
 end
@@ -30,6 +32,8 @@ end
 def investigate!(*args)
   yield
   business do
-    YAML.dump([{:hosts => "all", :tasks => $solution}])
+    playbook = {:hosts => "all"}.merge(*args)
+    playbook[:tasks] = $solution
+    YAML.dump([playbook])
   end
 end
