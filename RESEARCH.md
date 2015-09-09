@@ -97,3 +97,17 @@ https://help.launchpad.net/ReadingOpenPgpMail
 http://rnelson0.com/2014/10/13/fpm-and-build-automation/
 
 https://github.com/mruby/mruby/blob/master/src/backtrace.c
+
+http://ruby-doc.org/stdlib-1.9.3/libdoc/pty/rdoc/PTY.html#method-c-spawn
+
+http://rxr.whitequark.org/mri/source/ext/pty/pty.c?v=1.9.2-p381#228
+
+http://apidock.com/ruby/Open3/popen_run
+
+http://ruby-doc.org/stdlib-1.9.3/libdoc/open3/rdoc/Open3.html#method-c-popen3
+
+https://github.com/iij/mruby-process
+
+http://ruby-doc.org/core-1.9.3/Process.html#method-c-spawn
+
+https://github.com/iij/mruby-io
