@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 
 #include <mruby.h>
@@ -10,6 +11,10 @@
 #include <mruby/error.h>
 
 
+#include "detective.h"
+#include "investigation.h"
+
+
 static void if_exception_error_and_exit(mrb_state* mrb, char *msg) {
   // check for exception, only one can exist at any point in time
   if (mrb->exc) {
@@ -17,6 +22,44 @@ static void if_exception_error_and_exit(mrb_state* mrb, char *msg) {
     mrb_print_error(mrb);
     exit(2);
   }
+}
+
+
+static void eval_static_libs(mrb_state* mrb, ...) {
+  va_list argp;
+  va_start(argp, mrb);
+
+  int end_of_static_libs = 0;
+  uint8_t const *p;
+
+  while(!end_of_static_libs) {
+    p = va_arg(argp, uint8_t const*);
+    if (NULL == p) {
+      end_of_static_libs = 1;
+    } else {
+      mrb_load_irep(mrb, p);
+      if_exception_error_and_exit(mrb, "Exception in bundled ruby\n");
+    }
+  }
+
+  va_end(argp);
+}
+
+
+static mrb_value business(mrb_state* mrb, mrb_value obj)
+{
+  mrb_value ret;
+  mrb_value block;
+  mrb_get_args(mrb, "&", &block);
+
+  ret = mrb_yield_argv(mrb, block, 0, NULL);
+
+  if_exception_error_and_exit(mrb, "Exception in business yield\n");
+
+  char *tasks = mrb_str_to_cstr(mrb, ret);
+  fprintf(stdout, "%s", tasks);
+
+  return mrb_nil_value();
 }
 
 
@@ -45,6 +88,10 @@ int main(int argc, char** argv) {
   }
 
   mrb_define_global_const(mrb, "ARGV", args);
+
+  mrb_define_method(mrb, mrb->object_class, "business", business, MRB_ARGS_BLOCK());
+
+  eval_static_libs(mrb, detective, investigation, NULL);
 
   mrbc_context *detective_file = mrbc_context_new(mrb);
   mrbc_filename(mrb, detective_file, "Detectivefile");

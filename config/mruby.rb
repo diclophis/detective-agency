@@ -4,4 +4,5 @@ MRuby::Build.new do |conf|
 
   enable_debug
 
+  conf.bins = ["mrbc"]
 end
