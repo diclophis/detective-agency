@@ -14,13 +14,14 @@ Take for example the case of the missing ruby:
 
 ```ruby
 # find the ruby interperter's version
-investigate! :ruby do
-  if_its_true_that? "ruby -v | grep 'ruby 1.8'" do
-    you_need :apt => "pkg=ruby1.8 state=absent"
+#
+investigate! :name => %q{ruby tuesday} do
+  stake_out? %q{ruby -v | grep 'ruby 1.8'} do
+    usual_suspects! :apt => "pkg=ruby1.8 state=absent"
   end
 
-  unless_its_true_that? "ruby -v | grep 'ruby 1.9'" do
-    you_need :apt => "pkg=ruby1.9 state=latest"
+  stake_out! %q{ruby -v | grep 'ruby 1.9'} do
+    usual_suspects! :apt => "pkg=ruby1.9.3 state=latest"
   end
 end
 ```
