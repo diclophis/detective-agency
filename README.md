@@ -1,3 +1,5 @@
+![image](logo.png)
+
 # the devops detective-agency
 
 It was a cloudy Tuesday afternoon when she walked into my office, an ubuntu-lts server from North East data centah', with ethernet cord from her hard-drives to the floor.
