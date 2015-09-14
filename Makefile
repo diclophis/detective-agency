@@ -44,3 +44,14 @@ $(build)/%.h: lib/%.rb $(mrbc)
 
 $(yaml_static_lib):
 	cd yaml && ./configure CFLAGS="-DYAML_DECLARE_STATIC" --enable-static --disable-shared && make
+
+ppa:
+#gpg --gen-key
+#gpg --keyserver keyserver.ubuntu.com --send-keys
+#make clean
+#remove .git dirs
+#dh_make --createorig -c gpl -e diclophis+ubuntu@gmail.com -s -a -p detective-agency_0.2.0
+#debuild -S -sa
+#cd ..
+#dput -f -u ppa:diclophis/detective-agency detective-agency_0.2.0-1_source.changes 
+	echo read Makefile for manual instructions
