@@ -2,9 +2,9 @@
 
 # the devops detective-agency
 
-It was a cloudy Tuesday afternoon when she walked into my office, an ubuntu-lts server from North East data centah', with ethernet cord from her hard-drives to the floor.
+It was a cloudy Tuesday afternoon when it walked into my office, an ubuntu-lts server from North East data centah', with ethernet cord from her hard-drives to the floor.
 There was nothing but bad news in her logs, and I had a good idea how it got there...
-She had a problem, her ruby was missing... and thats when I knew I had a job to do!
+It had a problem, the ruby was missing... and thats when I knew I had a job to do!
 
 # how to solve the case
 
