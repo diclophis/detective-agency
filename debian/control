@@ -8,5 +8,5 @@ Homepage: https://github.com/diclophis/detective-agency
 
 Package: detective-agency
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ansible, docker
 Description: ansible playbook generator

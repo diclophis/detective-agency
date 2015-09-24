@@ -1,5 +1,6 @@
 # find the ruby interperter's version
 
+=begin
 investigate! :name => %q{ruby tuesday} do
   stake_out? %q{ruby -v | grep 'ruby 1.8'} do
     usual_suspects! :apt => "pkg=ruby1.8 state=absent"
@@ -8,4 +9,21 @@ investigate! :name => %q{ruby tuesday} do
   stake_out! %q{ruby -v | grep 'ruby 1.9'} do
     usual_suspects! :apt => "pkg=ruby1.9.3 state=latest"
   end
+end
+=end
+
+investigate! :name => %q{another ruby web app} do
+
+  stake_out! %q{nginx -v} do
+
+    usual_suspects! :apt => "pkg=nginx state=latest"
+
+  end
+
+  stake_out! %q{ruby -v} do
+
+    usual_suspects! :apt => "pkg=ruby1.9.3 state=latest"
+
+  end
+
 end
