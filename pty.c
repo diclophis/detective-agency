@@ -27,6 +27,7 @@
 
 #include <mruby.h>
 #include <mruby/variable.h>
+#include <mruby/error.h>
 
 //#include "rubyio.h"
 //#include "util.h"
@@ -35,6 +36,8 @@
 #ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>
 #endif
+
+#define HAVE_UNISTD_H
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -129,6 +132,10 @@ static int mrb_waitpid(int pid, int flags, int *st);
 #define rb_gid_t int
 #define rb_uid_t int
 
+#define Qnil mrb_nil_value()
+#define Qtrue mrb_true_value()
+#define Qfalse mrb_false_value()
+
 static mrb_value mrb_obj_ivar_get(mrb_state *mrb, mrb_value self);
 
 
@@ -194,6 +201,8 @@ pty_syswait(info)
     }
 }
 
+#define _(args) args
+
 static void getDevice _((int*, int*, char [DEVICELEN]));
 
 struct exec_info {
@@ -207,12 +216,14 @@ static VALUE
 pty_exec(v)
     VALUE v;
 {
-    struct exec_info *arg = (struct exec_info *)v;
-    return rb_f_exec(arg->argc, arg->argv);
+    //struct exec_info *arg = (struct exec_info *)v;
+    //return rb_f_exec(arg->argc, arg->argv);
+    return Qnil;
 }
 
 static void
-establishShell(argc, argv, info, SlaveName)
+establishShell(mrb, argc, argv, info, SlaveName)
+    mrb_state *mrb;
     int argc;
     VALUE *argv;
     struct pty_info *info;
@@ -238,7 +249,8 @@ establishShell(argc, argv, info, SlaveName)
 	    else
 		shellname = "/bin/sh";
 	}
-	v = rb_str_new2(shellname);
+	//v = rb_str_new2(shellname);
+	v = mrb_str_new_cstr(mrb, shellname);
 	argc = 1;
 	argv = &v;
     }
@@ -248,7 +260,7 @@ establishShell(argc, argv, info, SlaveName)
     if((i = fork()) < 0) {
 	close(master);
 	close(slave);
-	rb_sys_fail("fork failed");
+	mrb_sys_fail(mrb, "fork failed");
     }
 
     if(i == 0) {	/* child */
@@ -264,9 +276,9 @@ establishShell(argc, argv, info, SlaveName)
 	    perror("setpgrp()");
 #  else /* SETGRP_VOID */
 	if (setpgrp(0, getpid()) == -1)
-	    rb_sys_fail("setpgrp()");
+	    mrb_sys_fail(mrb, "setpgrp()");
 	if ((i = open("/dev/tty", O_RDONLY)) < 0)
-	    rb_sys_fail("/dev/tty");
+	    mrb_sys_fail(mrb, "/dev/tty");
 	else {
 	    if (ioctl(i, TIOCNOTTY, (char *)0))
 		perror("ioctl(TIOCNOTTY)");
@@ -303,7 +315,9 @@ establishShell(argc, argv, info, SlaveName)
 
 	arg.argc = argc;
 	arg.argv = argv;
-	rb_protect(pty_exec, (VALUE)&arg, &status);
+  //mrb_value v = mrb_funcall(mrb, ruby_res, mrb_intern(mrb, "to_int"), 0);
+	//rb_protect(pty_exec, (VALUE)&arg, &status);
+
 	sleep(1);
 	_exit(1);
     }
@@ -446,7 +460,7 @@ pty_getpty(argc, argv, self)
     MakeOpenFile(rport, rfptr);
     MakeOpenFile(wport, wfptr);
 
-    establishShell(argc, argv, &info, SlaveName);
+    establishShell(mrb_GGG, argc, argv, &info, SlaveName);
 
     rfptr->mode = rb_io_mode_flags("r");
     rfptr->f = fdopen(info.fd, "r");
@@ -492,13 +506,16 @@ pty_reset_signal(self)
 }
 
 static VALUE cPTY;
+static mrb_state *mrb_GGG;
 
 void
 Init_pty(mrb_state *mrb)
 {
+    mrb_GGG = mrb;
+
     cPTY = mrb_define_module(mrb, "PTY");
     //mrb_define_module_function(mrb, cPTY,"getpty",pty_getpty,-1);
-    //mrb_define_module_function(mrb, cPTY,"spawn",pty_getpty,-1);
+    mrb_define_module_function(mrb, cPTY,"spawn",pty_getpty,-1);
     //mrb_define_module_function(mrb, cPTY,"protect_signal",pty_protect,0);
     //mrb_define_module_function(mrb, cPTY,"reset_signal",pty_reset_signal,0);
 
