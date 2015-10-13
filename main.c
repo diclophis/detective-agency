@@ -106,21 +106,18 @@ static void feed_http(mrb_state *mrb, int SocketFD, char *request_token) {
 
   fd_set set;
   struct timeval timeout;
-  /* Initialize the file descriptor set. */
   FD_ZERO (&set);
   FD_SET (ConnectFD, &set);
-
-  /* Initialize the timeout data structure. */
   timeout.tv_sec = 30;
   timeout.tv_usec = 0;
 
-  /* select returns 0 if timeout, 1 if input available, -1 if error. */
+  // select returns 0 if timeout, 1 if input available, -1 if error.
   int rs = 1;
 
   size_t bytes_read = 0;
   int nn = 0;
 
-  while(rs == 1) {
+  while (1 == rs) {
     rs = TEMP_FAILURE_RETRY(select(FD_SETSIZE,
                                    &set, NULL, NULL,
                                    &timeout));
@@ -159,6 +156,83 @@ static void feed_http(mrb_state *mrb, int SocketFD, char *request_token) {
   }
   close(ConnectFD);
 }
+
+
+static void feed_terminal(mrb_state *mrb, int SocketFD) {
+  if (-1 == listen(SocketFD, 10)) {
+    perror("listen failed");
+    close(SocketFD);
+    exit(EXIT_FAILURE);
+  }
+
+  int ConnectFD = accept(SocketFD, NULL, NULL);
+
+  if (0 > ConnectFD) {
+    perror("accept failed");
+    close(SocketFD);
+    exit(EXIT_FAILURE);
+  }
+
+  char c[1];
+  mrb_value ret;
+  mrb_value in;
+
+  fd_set set;
+  struct timeval timeout;
+  FD_ZERO (&set);
+  FD_SET (ConnectFD, &set);
+  timeout.tv_sec = 30;
+  timeout.tv_usec = 0;
+
+  // select returns 0 if timeout, 1 if input available, -1 if error.
+  int rs = 1;
+
+  size_t bytes_read = 0;
+  int nn = 0;
+
+  char *http_response_header = "HTTP 200 OK\nContent-Type: text/event-stream\n\n";
+  int going = strlen(http_response_header);
+  int sent = send(ConnectFD, http_response_header, going, 0);
+
+  while (1 == rs) {
+    rs = TEMP_FAILURE_RETRY(select(FD_SETSIZE,
+                                   &set, NULL, NULL,
+                                   &timeout));
+
+    bytes_read = recv(ConnectFD, c, 1, 0);
+    if (bytes_read == -1) {
+      perror("reading from client");
+    }
+
+    printf("got: %s\n", c);
+
+    char *http_response = "data: {\"biz\": \"boo\"}\n\n";
+    going = strlen(http_response);
+    sent = send(ConnectFD, http_response, going, 0);
+
+    //in = mrb_str_new_cstr(mrb, c);
+    //ret = mrb_funcall(mrb, mrb_obj_value(mrb->object_class), "stack_byte", 1, in);
+    //if_exception_error_and_exit(mrb, "stack_byte");
+    //nn = mrb_bool(ret);
+    //if (nn) {
+    //  break;
+    //}
+  }
+
+  //char *http_response = mrb_str_to_cstr(mrb, ret);
+  //int going = strlen(http_response);
+  //int sent = send(ConnectFD, http_response, going, 0);
+  //printf("sent: %d %d\n", going, sent);
+
+  if (-1 == shutdown(ConnectFD, SHUT_RDWR)) {
+    perror("shutdown failed");
+    close(ConnectFD);
+    close(SocketFD);
+    exit(EXIT_FAILURE);
+  }
+  close(ConnectFD);
+}
+
 
 
 int main(int argc, char** argv) {
@@ -238,6 +312,8 @@ int main(int argc, char** argv) {
 
   feed_http(mrb, SocketFD, "");
   feed_http(mrb, SocketFD, "hterm");
+
+  feed_terminal(mrb, SocketFD);
 
   // cleanup mruby
   mrb_close(mrb);

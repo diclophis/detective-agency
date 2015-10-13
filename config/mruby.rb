@@ -8,6 +8,7 @@ MRuby::Build.new do |conf|
 
   conf.gem :git => 'git@github.com:AndrewBelt/mruby-yaml.git', :branch => 'master'
   conf.gem :git => 'git@github.com:mattn/mruby-base64.git', :branch => 'master'
+  conf.gem :git => 'https://github.com/iij/mruby-process.git', :branch => 'master'
 
   conf.cc do |cc|
     cc.flags = [ENV['CFLAGS'], "-I#{root}/../yaml/include"].join(" ")
