@@ -28,6 +28,7 @@
 #include <mruby.h>
 #include <mruby/variable.h>
 #include <mruby/error.h>
+#include <mruby/data.h>
 
 //#include "rubyio.h"
 //#include "util.h"
@@ -36,6 +37,9 @@
 #ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>
 #endif
+
+#include <stdlib.h>
+#include <pthread.h>
 
 #define HAVE_UNISTD_H
 
@@ -124,10 +128,27 @@ char	MasterDevice[] = "/dev/pty%s",
 //rb_waitpid
 //cpid = rb_waitpid(info->child_pid, &status, WUNTRACED);
 //mruby//build/mrbgems/mruby-process/src/process.c
-static int mrb_waitpid(int pid, int flags, int *st);
+//static int mrb_waitpid(int pid, int flags, int *st);
+static int
+mrb_waitpid(int pid, int flags, int *st)
+{
+  int result;
+
+retry:
+  result = waitpid(pid, st, flags);
+  if (result < 0) {
+    if (errno == EINTR) {
+      goto retry;
+    }
+    return -1;
+  }
+
+  return result;
+}
 
 
 #define VALUE mrb_value //struct RClass *
+
 #define rb_pid_t int
 #define rb_gid_t int
 #define rb_uid_t int
@@ -135,6 +156,63 @@ static int mrb_waitpid(int pid, int flags, int *st);
 #define Qnil mrb_nil_value()
 #define Qtrue mrb_true_value()
 #define Qfalse mrb_false_value()
+
+VALUE rb_cFile;
+
+typedef struct rb_io_t {
+    int fd;                     /* file descriptor */
+    FILE *stdio_file;           /* stdio ptr for read/write if available */
+    int mode;                   /* mode flags: FMODE_XXXs */
+    rb_pid_t pid;               /* child's pid (for pipes) */
+    int lineno;                 /* number of lines read */
+    VALUE pathv;                /* pathname for file */
+
+    //void (*finalize)(struct rb_io_t*,int); /* finalize proc */
+    //rb_io_buffer_t wbuf, rbuf;
+    //VALUE tied_io_for_writing;
+
+    /*
+     * enc  enc2 read action                      write action
+     * NULL NULL force_encoding(default_external) write the byte sequence of str
+     * e1   NULL force_encoding(e1)               convert str.encoding to e1
+     * e1   e2   convert from e2 to e1            convert str.encoding to e2
+     */
+    //struct rb_io_enc_t {
+    //    rb_encoding *enc;
+    //    rb_encoding *enc2;
+    //    int ecflags;
+    //    VALUE ecopts;
+    //} encs;
+    //rb_econv_t *readconv;
+    //rb_io_buffer_t cbuf;
+    //rb_econv_t *writeconv;
+    //VALUE writeconv_asciicompat;
+    //int writeconv_pre_ecflags;
+    //VALUE writeconv_pre_ecopts;
+    //int writeconv_initialized;
+    //VALUE write_lock;
+} rb_io_t;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 VALUE ruby_current_thread;
 
@@ -149,14 +227,55 @@ rb_thread_current(void)
     return GET_THREAD();
 }
 
+typedef struct {
+  int argc;
+  mrb_value* argv;
+  struct RProc* proc;
+  pthread_t thread;
+  mrb_state* mrb_caller;
+  mrb_state* mrb;
+  mrb_value result;
+  mrb_bool alive;
+} mrb_thread_context;
+
+static void
+mrb_thread_context_free(mrb_state *mrb, void *p) {
+  if (p) {
+    mrb_thread_context* context = (mrb_thread_context*) p;
+    if (context->mrb && context->mrb != mrb) mrb_close(context->mrb);
+    pthread_kill(context->thread, SIGINT);
+    if (context->argv) free(context->argv);
+    free(p);
+  }
+}
+
+static const struct mrb_data_type mrb_thread_context_type = {
+  "mrb_thread_context", mrb_thread_context_free,
+};
+
 //mruby//build/mrbgems/mruby-thread/src/mrb_thread.c
-static mrb_value mrb_thread_kill(mrb_state* mrb, mrb_value self);
+//static mrb_value mrb_thread_kill(mrb_state* mrb, mrb_value self);
+static mrb_value
+mrb_thread_kill(mrb_state* mrb, mrb_value self) {
+  mrb_value value_context = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "context"));
+  mrb_thread_context* context = NULL;
+  Data_Get_Struct(mrb, value_context, &mrb_thread_context_type, context);
+  if (context->mrb == NULL) {
+    return mrb_nil_value();
+  }
+  pthread_kill(context->thread, SIGINT);
+  mrb_close(context->mrb);
+  context->mrb = NULL;
+  return context->result;
+}
 
 static mrb_value mrb_obj_ivar_get(mrb_state *mrb, mrb_value self);
 
 
-static VALUE eChildExited;
-static VALUE cPTY;
+//static VALUE eChildExited;
+static struct RClass *eChildExited;
+//static VALUE cPTY;
+static struct RClass *cPTY;
 static mrb_state *mrb;
 
 static VALUE
@@ -429,18 +548,18 @@ get_device_once(master, slave, SlaveName, fail)
     char MasterName[DEVICELEN];
 
     for (p = deviceNo; *p != NULL; p++) {
-	snprintf(MasterName, sizeof MasterName, MasterDevice, *p);
-	if ((i = open(MasterName,O_RDWR,0)) >= 0) {
-	    *master = i;
-	    snprintf(SlaveName, sizeof SlaveName, SlaveDevice, *p);
-	    if ((j = open(SlaveName,O_RDWR,0)) >= 0) {
-		*slave = j;
-		chown(SlaveName, getuid(), getgid());
-		chmod(SlaveName, 0622);
-		return 0;
-	    }
-	    close(i);
-	}
+      snprintf(MasterName, sizeof MasterName, MasterDevice, *p);
+      if ((i = open(MasterName,O_RDWR,0)) >= 0) {
+        *master = i;
+        snprintf(SlaveName, sizeof SlaveName, SlaveDevice, *p);
+        if ((j = open(SlaveName,O_RDWR,0)) >= 0) {
+          *slave = j;
+          chown(SlaveName, getuid(), getgid());
+          chmod(SlaveName, 0622);
+          return 0;
+        }
+        close(i);
+      }
     }
     if (fail) mrb_raisef(mrb, E_RUNTIME_ERROR, "can't get %s", SlaveName);
     return -1;
@@ -459,6 +578,19 @@ getDevice(master, slave, slavename)
     }
 }
 
+/*
+#define MakeOpenFile(obj, fp) do {\
+    if (RFILE(obj)->fptr) {\
+        rb_io_close(obj);\
+        rb_io_fptr_finalize(RFILE(obj)->fptr);\
+        RFILE(obj)->fptr = 0;\
+    }\
+    (fp) = 0;\
+    RB_IO_FPTR_NEW(fp);\
+    RFILE(obj)->fptr = (fp);\
+} while (0)
+*/
+
 /* ruby function: getpty */
 static VALUE
 pty_getpty(argc, argv, self)
@@ -467,6 +599,7 @@ pty_getpty(argc, argv, self)
     VALUE self;
 {
     VALUE res;
+/*
     struct pty_info info;
     struct pty_info thinfo;
     rb_io_t *wfptr,*rfptr;
@@ -501,6 +634,9 @@ pty_getpty(argc, argv, self)
 	return Qnil;
     }
     return res;
+*/
+
+  return res;
 }
 
 /* ruby function: protect_signal - obsolete */
