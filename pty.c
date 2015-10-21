@@ -136,10 +136,28 @@ static int mrb_waitpid(int pid, int flags, int *st);
 #define Qtrue mrb_true_value()
 #define Qfalse mrb_false_value()
 
+VALUE ruby_current_thread;
+
+static inline VALUE
+GET_THREAD(void) {
+  return ruby_current_thread;
+}
+
+VALUE
+rb_thread_current(void)
+{
+    return GET_THREAD();
+}
+
+//mruby//build/mrbgems/mruby-thread/src/mrb_thread.c
+static mrb_value mrb_thread_kill(mrb_state* mrb, mrb_value self);
+
 static mrb_value mrb_obj_ivar_get(mrb_state *mrb, mrb_value self);
 
 
 static VALUE eChildExited;
+static VALUE cPTY;
+static mrb_state *mrb;
 
 static VALUE
 //echild_status(self)
@@ -222,8 +240,7 @@ pty_exec(v)
 }
 
 static void
-establishShell(mrb, argc, argv, info, SlaveName)
-    mrb_state *mrb;
+establishShell(argc, argv, info, SlaveName)
     int argc;
     VALUE *argv;
     struct pty_info *info;
@@ -333,9 +350,9 @@ static VALUE
 pty_finalize_syswait(info)
     struct pty_info *info;
 {
-    rb_thread_kill(info->thread);
-    rb_funcall(info->thread, rb_intern("value"), 0);
-    rb_detach_process(info->child_pid);
+    mrb_thread_kill(mrb, info->thread);
+    //rb_funcall(info->thread, rb_intern("value"), 0);
+    //rb_detach_process(info->child_pid);
     return Qnil;
 }
 
@@ -352,7 +369,7 @@ get_device_once(master, slave, SlaveName, fail)
     if (openpty(master, slave, SlaveName,
 		(struct termios *)0, (struct winsize *)0) == -1) {
 	if (!fail) return -1;
-	rb_raise(rb_eRuntimeError, "openpty() failed");
+	mrb_raise(mrb, E_RUNTIME_ERROR, "openpty() failed");
     }
 
     return 0;
@@ -361,7 +378,7 @@ get_device_once(master, slave, SlaveName, fail)
 
     if (!(name = _getpty(master, O_RDWR, 0622, 0))) {
 	if (!fail) return -1;
-	rb_raise(rb_eRuntimeError, "_getpty() failed");
+	mrb_raise(mrb, E_RUNTIME_ERROR, "_getpty() failed");
     }
 
     *slave = open(name, O_RDWR);
@@ -405,7 +422,7 @@ get_device_once(master, slave, SlaveName, fail)
 	}
 	close(i);
     }
-    if (!fail) rb_raise(rb_eRuntimeError, "can't get Master/Slave device");
+    if (!fail) mrb_raise(mrb, E_RUNTIME_ERROR, "can't get Master/Slave device");
     return -1;
 #else
     char **p;
@@ -425,7 +442,7 @@ get_device_once(master, slave, SlaveName, fail)
 	    close(i);
 	}
     }
-    if (fail) rb_raise(rb_eRuntimeError, "can't get %s", SlaveName);
+    if (fail) mrb_raisef(mrb, E_RUNTIME_ERROR, "can't get %s", SlaveName);
     return -1;
 #endif
 #endif
@@ -460,7 +477,7 @@ pty_getpty(argc, argv, self)
     MakeOpenFile(rport, rfptr);
     MakeOpenFile(wport, wfptr);
 
-    establishShell(mrb_GGG, argc, argv, &info, SlaveName);
+    establishShell(argc, argv, &info, SlaveName);
 
     rfptr->mode = rb_io_mode_flags("r");
     rfptr->f = fdopen(info.fd, "r");
@@ -505,13 +522,11 @@ pty_reset_signal(self)
     return self;
 }
 
-static VALUE cPTY;
-static mrb_state *mrb_GGG;
 
 void
-Init_pty(mrb_state *mrb)
+Init_pty(mrb_state *mrb_)
 {
-    mrb_GGG = mrb;
+    mrb = mrb_;
 
     cPTY = mrb_define_module(mrb, "PTY");
     //mrb_define_module_function(mrb, cPTY,"getpty",pty_getpty,-1);
