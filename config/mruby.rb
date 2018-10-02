@@ -10,6 +10,7 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git@github.com:mattn/mruby-base64.git', :branch => 'master'
   conf.gem :git => 'https://github.com/iij/mruby-process.git', :branch => 'master'
   conf.gem :git => 'https://github.com/mattn/mruby-thread.git', :branch => 'master'
+  conf.gem :git => 'git@github.com:puma/puma.git', :branch => 'master'
 
 
   conf.cc do |cc|
