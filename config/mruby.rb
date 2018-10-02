@@ -14,6 +14,6 @@ MRuby::Build.new do |conf|
 
 
   conf.cc do |cc|
-    cc.flags = [ENV['CFLAGS'], "-I#{root}/../yaml/include"].join(" ")
+    cc.flags = [ENV['CFLAGS'], "-lm -I#{root}/../yaml/include"].join(" ")
   end
 end

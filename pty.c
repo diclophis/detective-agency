@@ -512,7 +512,7 @@ getDevice(master, slave, slavename)
     char slavename[DEVICELEN];
 {
     if (get_device_once(master, slave, slavename, 0)) {
-	rb_gc();
+	//rb_gc();
 	get_device_once(master, slave, slavename, 1);
     }
 }
@@ -583,8 +583,8 @@ static VALUE
 pty_protect(self)
     VALUE self;
 {
-    rb_warn("PTY::protect_signal is no longer needed");
-    rb_yield(Qnil);
+    //rb_warn("PTY::protect_signal is no longer needed");
+    //rb_yield(Qnil);
     return self;
 }
 
@@ -593,7 +593,7 @@ static VALUE
 pty_reset_signal(self)
     VALUE self;
 {
-    rb_warn("PTY::reset_signal is no longer needed");
+    //rb_warn("PTY::reset_signal is no longer needed");
     return self;
 }
 

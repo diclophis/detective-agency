@@ -13,9 +13,10 @@ static_ruby_headers = $(patsubst %,$(build)/%, $(patsubst lib/%.rb,%.h, $(wildca
 objects += $(mruby_static_lib) $(yaml_static_lib)
 
 CFLAGS=-Imruby/include -I$(build)
+LDFLAGS=-lm -pthread
 
 $(target): $(build) $(objects)
-	$(CC) $(LDFLAGS) -o $@ $(objects)
+	$(CC) -o $@ $(objects) $(LDFLAGS)
 
 test: $(build)/test.yml
 	ansible-playbook --list-tasks -v -i 'localhost,' -c local $(build)/test.yml
@@ -43,7 +44,7 @@ $(build)/%.h: lib/%.rb $(mrbc)
 	mruby/bin/mrbc -g -B $(patsubst $(build)/%.h,%, $@) -o $@ $<
 
 $(yaml_static_lib):
-	cd yaml && ./configure CFLAGS="-DYAML_DECLARE_STATIC" --enable-static --disable-shared && make
+	cd yaml && autoreconf -fvi && ./configure CFLAGS="-DYAML_DECLARE_STATIC" --enable-static --disable-shared && make
 
 ppa:
 #gpg --gen-key
